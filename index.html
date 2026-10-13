@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POL4057 Case Sign-up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a briefing board. Identity + your picks in a sticky rail; the cases as dossier cards grouped by presentation week. */
+:root{
+  --bg:#f3f4f2; --panel:#ffffff; --ink:#18212b; --muted:#5b6672; --line:#d7dbd6;
+  --accent:#1d5c63; --accent-soft:#dcebec; --alt:#7a5a14; --alt-soft:#f4ead2;
+  --ok:#2f6b3a; --warn:#9a5b00; --full:#8a2a2a;
+  --display:"Archivo",system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#12171c; --panel:#1a2128; --ink:#e7ebee; --muted:#9aa6b1; --line:#2c353e;
+  --accent:#6fb6bd; --accent-soft:#1d3438; --alt:#d8b363; --alt-soft:#352c18;
+  --ok:#79c088; --warn:#e2a64a; --full:#e07a7a; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 60px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,3.2vw,2.3rem);margin:4px 0 6px;text-wrap:balance;letter-spacing:-.01em}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header p{margin:0;color:var(--muted);max-width:70ch}
+.rules{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.rule{font-size:.86rem;border:1px solid var(--line);border-radius:999px;padding:3px 11px;background:var(--panel)}
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:28px;margin-top:26px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.rail{position:sticky;top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
+@media (max-width:860px){.rail{position:static}}
+.rail h2,.week h2{font-family:var(--display);font-weight:700;font-size:1.05rem;margin:0}
+label{display:flex;flex-direction:column;gap:4px;font-size:.88rem;font-weight:600}
+select{font:inherit;font-weight:400;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);max-width:100%}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=text]{font:inherit;font-weight:400;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.picks{display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.pick{display:flex;gap:8px;align-items:baseline}
+.tag{font-family:var(--mono);font-size:.7rem;padding:1px 6px;border-radius:4px;flex:none}
+.tag.first{background:var(--accent);color:var(--panel)}
+.tag.alt{background:var(--alt-soft);color:var(--alt)}
+.hint{font-size:.86rem;color:var(--muted)}
+.msg{font-size:.9rem;padding:8px 10px;border-radius:6px;background:var(--bg)}
+.msg.err{color:var(--full)} .msg.ok{color:var(--ok)}
+button{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 12px}
+button:disabled{cursor:not-allowed;opacity:.45}
+.primary{background:var(--accent);border-color:var(--accent);color:var(--panel);font-weight:600;padding:10px 14px}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font-size:.86rem}
+.weeks{display:flex;flex-direction:column;gap:26px}
+.week-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:12px}
+.cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.cases{grid-template-columns:1fr}}
+.case{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.case.mine-first{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.case.mine-alt{border-color:var(--alt)}
+.case h3{font-family:var(--display);font-weight:700;font-size:1.05rem;margin:0;text-wrap:balance}
+.why{font-size:.9rem;color:var(--muted);margin:0}
+.meter{display:flex;align-items:center;gap:10px}
+.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;flex:1;max-width:180px}
+.slot{height:10px;border-radius:2px;background:var(--line)}
+.slot.on{background:var(--accent)}
+.slot.min{box-shadow:inset -2px 0 0 var(--ink)}
+.status{font-family:var(--mono);font-size:.74rem;white-space:nowrap}
+.status.low{color:var(--warn)} .status.ready{color:var(--ok)} .status.full{color:var(--full)}
+.names{display:flex;flex-direction:column;gap:6px}
+.names .row{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.chip{font-size:.82rem;padding:2px 8px;border-radius:999px}
+.chip.first{background:var(--accent-soft);font-weight:600}
+.chip.alt{border:1px dashed var(--alt);color:var(--muted)}
+.empty{font-size:.82rem;color:var(--muted);font-style:italic}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.actions button{font-size:.86rem}
+.actions .on-first{background:var(--accent);color:var(--panel);border-color:var(--accent)}
+.actions .on-alt{background:var(--alt-soft);color:var(--alt);border-color:var(--alt)}
+.banner{margin-top:16px;padding:10px 14px;border-radius:8px;background:var(--alt-soft);font-size:.92rem}
+.admin{margin-top:36px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.admin h2{font-family:var(--display);margin:0;font-size:1.15rem}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+footer{margin-top:30px;font-size:.82rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">POL4057 · Hybrid War and Contemporary Hybrid Threats · Fall 2026</div>
+    <h1>Case Study Presentations: choose your case</h1>
+    <p>Pick two cases: the one you most want to present (your first choice) and one alternative. Groups need at least 4 and at most 6 students. Cases that do not reach 4 will close, and their students move to their alternative. Each presentation is a 15-minute case study.</p>
+    <div class="rules">
+      <span class="rule">1 first choice</span>
+      <span class="rule">1 alternative</span>
+      <span class="rule">Group size 4–6</span>
+      <span class="rule">First choices close at 6</span>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <div class="grid">
+    <aside class="rail" aria-label="Your selection">
+      <h2>Your selection</h2>
+      <label for="sname">Your name<select id="sname"><option value="">Select your name…</option></select></label>
+      <div class="hint" id="savedNote"></div>
+      <div class="picks" id="picks"></div>
+      <div class="hint" id="countHint"></div>
+      <button class="primary" id="submit" type="button">Save my choices</button>
+      <div class="msg" id="msg" hidden></div>
+      <div class="hint">Your student number is filled in automatically for your instructor. Other students see only your name.</div>
+    </aside>
+    <main class="weeks" id="weeks"></main>
+  </div>
+
+  <section class="admin" id="admin" hidden aria-label="Instructor view">
+    <h2>Suggested groups</h2>
+    <p class="hint">Built from the current choices: cases below 4 students close one by one and their students move to their alternative. This is a suggestion; nothing is saved.</p>
+    <div class="actions"><button id="runAlloc" type="button">Recalculate</button><button id="dlAlloc" type="button">Download (.csv)</button></div>
+    <div id="allocOut"></div>
+  </section>
+
+  <footer><span id="updated">Loading choices…</span><a href="#instructor" id="adminLink">Instructor view</a></footer>
+</div>
+
+<script>
+/* Paste your Apps Script Web app URL here (ends with /exec). */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2rKsg53vQ2oQz0zELhoXHtXBGHisn6v1hagzllO8AMozWrz__5hhdOWLF7MTOoLJN/exec";
+
+const CASES = [
+  {id:"cy1", week:8, date:"9 Nov", theme:"Cyber-Attacks", title:"Estonia, 2007", why:"The founding case of a cyber campaign below the threshold, with unresolved attribution."},
+  {id:"cy2", week:8, date:"9 Nov", theme:"Cyber-Attacks", title:"Stuxnet, 2010", why:"Covert sabotage of Iran's nuclear programme without any declared war."},
+  {id:"di2", week:8, date:"9 Nov", theme:"Disinformation", title:"MH17, 2014", why:"Competing false stories used to blur responsibility for a downed airliner."},
+  {id:"di3", week:8, date:"9 Nov", theme:"Disinformation", title:"Romania's 2024 presidential election", why:"A first round annulled over an alleged coordinated TikTok influence campaign."},
+  {id:"ai1", week:9, date:"16 Nov", theme:"Artificial Intelligence", title:"AI-enabled targeting and intelligence in Ukraine", why:"How AI enters military decision-making in a live war."},
+  {id:"ai2", week:9, date:"16 Nov", theme:"Artificial Intelligence", title:"Slovakia's 2023 election deepfake", why:"A contained, well-reported case of AI-generated content aimed at an election."},
+  {id:"ai3", week:9, date:"16 Nov", theme:"Artificial Intelligence", title:"State influence operations using generative AI (2024 reports)", why:"Takedown reports on Russian, Chinese and Iranian networks: does AI really enable hybrid operations?"},
+  {id:"dr1", week:10, date:"23 Nov", theme:"Drones", title:"Drones in the war in Ukraine (FPV and Black Sea naval drones)", why:"How cheap unmanned systems change the character of a conventional war."},
+  {id:"dr2", week:10, date:"23 Nov", theme:"Drones", title:"Shahed/Geran drones and Iran–Russia cooperation", why:"One-way attack drones, technology transfer and a state-to-state proxy relationship."},
+  {id:"px1", week:10, date:"23 Nov", theme:"Proxy Forces", title:"Wagner Group in Syria, Libya and the Sahel", why:"A private military company as a deniable instrument of state power."},
+  {id:"px2", week:10, date:"23 Nov", theme:"Proxy Forces", title:"Donbas, 2014–15", why:"Separatists, \"volunteers\" and denied Russian units: proxies and deniability together."},
+  {id:"so1", week:11, date:"30 Nov", theme:"Societal Threats", title:"Belarus–EU border crisis, 2021", why:"The clearest case of migration used as a weapon."},
+  {id:"so2", week:11, date:"30 Nov", theme:"Societal Threats", title:"Ceuta, 2021 (Morocco–Spain)", why:"Border controls eased during a diplomatic dispute: migration as leverage."}
+];
+const STUDENTS = ["ADHAM MAHMUT", "ALI HAJIYEV", "ALİ FURKAN ÖREN", "AMAL HALILOV", "ATILAY NAİL ARPACI", "AYLAR BABAYEVA", "BAHADIR YILDIRIM", "BARAN TIREN", "BERKAY KILIÇ", "BERRA ARSLANKAYA", "BORYS ÖNDER ETİ", "DEFNE KABA", "GISMAT NABIYEV", "GUILLEM LAFONT VALERO", "GÜLÇİN İLMEKLİ", "HALA HAMED", "HELİN MENGÜTAY", "KAMEL M. K. ALLULU ALIAA", "KEMAL CAN BAYRAMOĞLU", "KEMAL YAZICIOĞLU", "KEREM ACAR", "LEONIE FRICKE", "MANI MOFIDI ZATI", "MEHMET TAHA ZİLELİ", "MELİHCAN TOSUN", "MISRA ÇAKIRKA", "MURAT ALTUN", "MUSTAFA IRMAK", "NOELLE VAN VEEN", "NURSİMA GÖKALP", "RABİA YAREN İLKER", "SENA NUR YAŞAR", "SUDE NAZ AY", "SULTAN NOFALE", "SİNAN BUĞRA EMİROGLU", "YİĞİT ALİ HAYAT", "ÖMER DİNÇER", "İLKER ALKIN TERZİ"];
+const MIN = 4, MAX = 6;
+const byId = Object.fromEntries(CASES.map(c => [c.id, c]));
+
+let entries = [];          // [{name, first, alt}] from the sheet
+let open = true, online = false, saving = false;
+let draft = {first: null, alt: null};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const me = () => $("#sname").value;
+const firstCountOthers = cid => entries.filter(e => e.first === cid && e.name !== me()).length;
+
+function fillNames(){
+  const sel = $("#sname"), cur = sel.value;
+  const saved = new Set(entries.map(e => e.name));
+  const sorted = [...STUDENTS].sort((a, b) => a.localeCompare(b, "tr"));
+  sel.innerHTML = '<option value="">Select your name…</option>' + sorted.map(n => `<option value="${esc(n)}">${esc(n)}${saved.has(n) ? "  ✓ saved" : ""}</option>`).join("");
+  sel.value = cur;
+}
+$("#sname").addEventListener("change", () => {
+  const mine = entries.find(e => e.name === me());
+  if (mine){ draft = {first: mine.first, alt: mine.alt}; $("#savedNote").textContent = "Your saved choices are loaded. Saving again replaces them."; }
+  else { $("#savedNote").textContent = ""; }
+  showMsg(""); render();
+});
+
+function statusOf(n){
+  if (n >= MAX) return ["full", "Full · 6/6"];
+  if (n >= MIN) return ["ready", `Ready · ${n}/6`];
+  return ["low", `Needs ${MIN - n} more · ${n}/6`];
+}
+
+function renderCase(c){
+  const firsts = entries.filter(e => e.first === c.id), alts = entries.filter(e => e.alt === c.id);
+  const n = firsts.length, [cls, label] = statusOf(n);
+  const isFirst = draft.first === c.id, isAlt = draft.alt === c.id;
+  const firstBlocked = !isFirst && firstCountOthers(c.id) >= MAX;
+  const dis = !open || !online;
+  const chips = (list, kind) => list.length ? list.map(e => `<span class="chip ${kind}">${esc(e.name)}</span>`).join("") : `<span class="empty">${kind === "first" ? "No first choices yet" : "No alternatives yet"}</span>`;
+  const slots = Array.from({length: MAX}, (_, i) => `<span class="slot${i < n ? " on" : ""}${i === MIN - 1 ? " min" : ""}"></span>`).join("");
+  return `<article class="case${isFirst ? " mine-first" : isAlt ? " mine-alt" : ""}">
+    <span class="eyebrow">${esc(c.theme)}</span>
+    <h3>${esc(c.title)}</h3>
+    <p class="why">${esc(c.why)}</p>
+    <div class="meter"><div class="slots" aria-hidden="true">${slots}</div><span class="status ${cls}">${label}</span></div>
+    <div class="names">
+      <div class="row"><span class="tag first">1st</span>${chips(firsts, "first")}</div>
+      <div class="row"><span class="tag alt">Alt</span>${chips(alts, "alt")}</div>
+    </div>
+    <div class="actions">
+      <button type="button" data-act="first" data-id="${c.id}" class="${isFirst ? "on-first" : ""}" ${dis || firstBlocked ? "disabled" : ""} aria-pressed="${isFirst}">${isFirst ? "✓ First choice" : firstBlocked ? "First choices full" : "Make first choice"}</button>
+      <button type="button" data-act="alt" data-id="${c.id}" class="${isAlt ? "on-alt" : ""}" ${dis || isFirst ? "disabled" : ""} aria-pressed="${isAlt}">${isAlt ? "✓ Alternative" : "Add as alternative"}</button>
+    </div>
+  </article>`;
+}
+
+function render(){
+  const weeks = [...new Set(CASES.map(c => c.week))];
+  $("#weeks").innerHTML = weeks.map(w => {
+    const cs = CASES.filter(c => c.week === w);
+    return `<section class="week" aria-label="Week ${w}">
+      <div class="week-head"><h2>Week ${w} · ${esc([...new Set(cs.map(c => c.theme))].join(" + "))}</h2><span class="eyebrow">Presents ${esc(cs[0].date)} · ${cs.length} cases</span></div>
+      <div class="cases">${cs.map(renderCase).join("")}</div></section>`;
+  }).join("");
+
+  const rows = [];
+  if (draft.first) rows.push(`<div class="pick"><span class="tag first">1st</span><span>${esc(byId[draft.first].title)}</span></div>`);
+  if (draft.alt) rows.push(`<div class="pick"><span class="tag alt">Alt</span><span>${esc(byId[draft.alt].title)}</span></div>`);
+  $("#picks").innerHTML = rows.join("") || '<div class="hint">No cases picked yet. Use the buttons on the case cards.</div>';
+  const need = [];
+  if (!draft.first) need.push("choose a first choice");
+  if (!draft.alt) need.push("add an alternative");
+  $("#countHint").textContent = need.length ? "To save: " + need.join(" and ") + "." : "Both choices picked. You can now save.";
+  $("#submit").disabled = !open || !online || saving;
+
+  const b = $("#banner");
+  const t = SCRIPT_URL.startsWith("PASTE") ? "Setup not finished: the instructor has not connected the database yet."
+    : !online ? "Can't reach the database right now. Check your connection; the page retries automatically."
+    : !open ? "Selections are closed. Your instructor is forming the groups." : "";
+  b.textContent = t; b.hidden = !t;
+  if (location.hash === "#instructor") renderAlloc();
+}
+
+function showMsg(text, kind){ const m = $("#msg"); m.textContent = text; m.className = "msg " + (kind || ""); m.hidden = !text; }
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button[data-act]");
+  if (!b || b.disabled) return;
+  const id = b.dataset.id;
+  if (b.dataset.act === "first"){ draft.first = draft.first === id ? null : id; if (draft.alt === id) draft.alt = null; }
+  else draft.alt = draft.alt === id ? null : id;
+  showMsg(""); render();
+});
+
+async function load(){
+  if (SCRIPT_URL.startsWith("PASTE")) { online = false; render(); return null; }
+  try {
+    const r = await fetch(SCRIPT_URL, {cache: "no-store"});
+    const d = await r.json();
+    entries = (d.entries || []).filter(e => byId[e.first]);
+    open = d.open !== false; online = true;
+    $("#updated").textContent = `${entries.length} of ${STUDENTS.length} students have chosen · updated ${new Date().toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}`;
+    fillNames(); render();
+    return d;
+  } catch (_) { online = false; render(); return null; }
+}
+
+$("#submit").addEventListener("click", async () => {
+  const name = me();
+  if (!name) return showMsg("Select your name from the list.", "err");
+  if (!draft.first) return showMsg("Choose a first choice.", "err");
+  if (!draft.alt) return showMsg("Add an alternative.", "err");
+  saving = true; render(); showMsg("Saving…");
+  try {
+    const r = await fetch(SCRIPT_URL, {method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({name, first: draft.first, alt: draft.alt})});
+    const d = await r.json();
+    if (d.ok){ showMsg(d.updated ? "Updated. Your new choices replace the old ones." : "Saved. You can change your choices until selections close.", "ok"); }
+    else showMsg(d.error || "Couldn't save. Try again.", "err");
+  } catch (_) { showMsg("Couldn't save. Check your connection and try again.", "err"); }
+  saving = false; await load();
+});
+
+/* ---------- Instructor view (#instructor) ---------- */
+let lastAlloc = null;
+function allocate(){
+  const ids = CASES.map(c => c.id), openSet = new Set(ids);
+  const people = entries.map((e, i) => ({...e, key: i}));
+  const assign = new Map(people.map(p => [p.key, p.first]));
+  const count = () => { const m = Object.fromEntries(ids.map(i => [i, 0])); for (const t of assign.values()) if (t && openSet.has(t)) m[t]++; return m; };
+  const place = p => { const m = count(); assign.set(p.key, [p.first, p.alt].find(t => openSet.has(t) && m[t] < MAX) || null); };
+  for (let guard = 0; guard < 40; guard++){
+    people.forEach(p => { const t = assign.get(p.key); if (!t || !openSet.has(t)) place(p); });
+    const m = count();
+    const weak = [...openSet].filter(t => m[t] < MIN);
+    if (!weak.length) break;
+    const interest = t => people.filter(p => p.first === t || p.alt === t).length;
+    weak.sort((a, b) => m[a] - m[b] || interest(a) - interest(b));
+    openSet.delete(weak[0]);
+    people.forEach(p => { if (assign.get(p.key) === weak[0]) assign.set(p.key, null); });
+  }
+  people.forEach(p => { const t = assign.get(p.key); if (!t || !openSet.has(t)) place(p); });
+  const groups = CASES.filter(c => openSet.has(c.id)).map(c => ({c, members: people.filter(p => assign.get(p.key) === c.id).map(p => ({...p, got: p.first === c.id ? "1st" : "Alt"}))})).filter(g => g.members.length);
+  return {groups, unplaced: people.filter(p => !assign.get(p.key)), closed: CASES.filter(c => !groups.find(g => g.c.id === c.id))};
+}
+function renderAlloc(){
+  $("#admin").hidden = false;
+  lastAlloc = allocate();
+  const {groups, unplaced, closed} = lastAlloc;
+  const got1 = groups.reduce((n, g) => n + g.members.filter(m => m.got === "1st").length, 0);
+  $("#allocOut").innerHTML = `<p class="hint">${groups.length} groups · ${got1} of ${entries.length} students on their first choice · closed: ${closed.map(c => esc(c.title)).join("; ") || "none"}</p>
+    <div class="tablewrap"><table><thead><tr><th>Week</th><th>Case</th><th>Size</th><th>Members</th></tr></thead><tbody>
+    ${groups.map(g => `<tr><td>W${g.c.week}</td><td>${esc(g.c.title)}</td><td>${g.members.length}</td><td>${g.members.map(m => `${esc(m.name)} <span class="hint">(${m.got})</span>`).join(", ")}</td></tr>`).join("")}
+    ${unplaced.length ? `<tr><td></td><td><b>Unplaced</b></td><td>${unplaced.length}</td><td>${unplaced.map(p => esc(p.name)).join(", ")}</td></tr>` : ""}
+    </tbody></table></div>`;
+}
+$("#runAlloc").addEventListener("click", renderAlloc);
+$("#dlAlloc").addEventListener("click", () => {
+  if (!lastAlloc) renderAlloc();
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = [["Week","Date","Case","Name","Placed on"]];
+  lastAlloc.groups.forEach(g => g.members.forEach(m => rows.push(["W" + g.c.week, g.c.date, g.c.title, m.name, m.got])));
+  lastAlloc.unplaced.forEach(p => rows.push(["", "", "UNPLACED", p.name, ""]));
+  const blob = new Blob(["﻿" + rows.map(r => r.map(q).join(",")).join("\n")], {type: "text/csv;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "POL4057_suggested_groups.csv"; a.click(); URL.revokeObjectURL(a.href);
+});
+window.addEventListener("hashchange", () => { if (location.hash === "#instructor") renderAlloc(); else $("#admin").hidden = true; });
+
+fillNames();
+render();
+load();
+setInterval(() => { if (!document.hidden && !saving) load(); }, 20000);
+</script>
+</body>
+</html>
